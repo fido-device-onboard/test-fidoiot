@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+     Copyright 2020 Intel Corporation
+     SPDX-License-Identifier: Apache 2.0
+-->
+
+<!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd">
+<suite name="FDO_PRI_Tests" verbose="1">
+  <test name="FDO_Pri_Smoke_Test">
+    <groups>
+      <run>
+        <include name="fdo_PRI_smoketest"/>
+      </run>
+    </groups>
+    <packages>
+      <package name="org.fdo.test" />
+    </packages>
+  </test>
+</suite>

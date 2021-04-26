@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+     Copyright 2020 Intel Corporation
+     SPDX-License-Identifier: Apache 2.0
+-->
+
+<Configuration status="warn" packages="org.sdo.automation.testngappender">
+  <Appenders>
+    <Console name="Console" target="SYSTEM_OUT">
+      <PatternLayout pattern="%d{HH:mm:ss.SSS} [%t] %-5level: %msg%n"/>
+    </Console>
+    <File name="FileAppender" fileName="${env:TESTNG_LOG_DIR}/${date:yyyyMMdd_HHMMSS}.log" append="false">
+      <!-- <PatternLayout pattern="%highlight{%d{HH:mm:ss.SSS} [%t] %-5level: %msg%n}"/> -->
+      <PatternLayout pattern="%d{HH:mm:ss.SSS} [%t] %-5level: %msg%n"/>
+    </File>
+    <TestNGReporter name="TestAppender">
+      <PatternLayout pattern="%d{HH:mm:ss.SSS} [%t] %-5level: %msg%n"/>
+    </TestNGReporter>
+  </Appenders>
+
+  <Loggers>
+    <Root level="trace">
+      <AppenderRef ref="Console" level="trace"/>
+      <AppenderRef ref="FileAppender" level="info"/>
+      <AppenderRef ref="TestAppender" level="warn"/>
+    </Root>
+  </Loggers>
+</Configuration>
