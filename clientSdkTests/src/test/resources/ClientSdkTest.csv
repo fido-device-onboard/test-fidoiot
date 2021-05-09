@@ -1,2 +1,2 @@
 testName,enabled,deviceType,sviEnabled
-Client-sdk-test,TRUE,client-sdk,FALSE
+Client-sdk-test,TRUE,client-sdk,TRUE

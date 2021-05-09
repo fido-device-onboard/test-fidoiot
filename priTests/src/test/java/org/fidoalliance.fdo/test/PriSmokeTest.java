@@ -130,7 +130,7 @@ public class PriSmokeTest extends TestCase {
       String guid = br.readLine();
 
       String[] shellCmdServiceInfoActivate = {"bash", "-cx",
-          "curl --location --request PUT 'http://localhost:8042/api/v1/device/svi?module=fdo_sys&"
+          "curl --location --digest -u apiUser:OwnerApiPass123 --request PUT 'http://localhost:8042/api/v1/device/svi?module=fdo_sys&"
               + "var=active&priority=0&bytes=F5' --header 'Content-Type: application/octet-stream'"};
       TestProcess shellServiceInfo = new TestProcess(testPath, shellCmdServiceInfoActivate);
       try (TestProcess.Handle hShellCmd = shellServiceInfo.start()) {
@@ -138,7 +138,7 @@ public class PriSmokeTest extends TestCase {
       }
 
       String[] shellCmdServiceInfoFileTransfer = {"bash", "-cx",
-          "curl --location --request PUT 'http://localhost:8042/api/v1/device/svi?module=fdo_sys&"
+          "curl --location --digest -u apiUser:OwnerApiPass123 --request PUT 'http://localhost:8042/api/v1/device/svi?module=fdo_sys&"
               + "var=filedesc&priority=1&filename=linux64.sh&guid=" + guid
               + "' --header 'Content-Type: application/octet-stream' --data-binary "
               + "'@common/src/main/resources/linux64.sh'"};
@@ -150,7 +150,7 @@ public class PriSmokeTest extends TestCase {
       }
 
       String[] shellCmdServiceInfoExec = {"bash", "-cx",
-          "curl --location --request PUT 'http://localhost:8042/api/v1/device/svi?module=fdo_sys&"
+          "curl --location --digest -u apiUser:OwnerApiPass123 --request PUT 'http://localhost:8042/api/v1/device/svi?module=fdo_sys&"
               + "var=exec&guid=" + guid + "&priority=2&"
               + "bytes=82672F62696E2F73686A6C696E757836342E7368' "
               + "--header 'Content-Type: application/octet-stream'"};
