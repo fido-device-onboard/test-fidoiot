@@ -3,6 +3,8 @@
 
 package org.fidoalliance.fdo.test;
 
+import java.io.BufferedReader;
+import java.io.FileReader;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -119,6 +121,42 @@ public class ClientSdkTest extends TestCase {
     TestProcess shellTo = new TestProcess(testPath, shellCmdTo);
     try (TestProcess.Handle hShellCmdTo = shellTo.start()) {
       hShellCmdTo.waitFor(1000, TimeUnit.MILLISECONDS);
+    }
+
+    if (sviEnabled.toLowerCase().equals("true")) {
+      BufferedReader br = new BufferedReader(new FileReader(Paths.get(testDir + "/guid").toFile()));
+      String guid = br.readLine();
+
+      String[] shellCmdServiceInfoActivate = {"bash", "-cx",
+          "curl --location --digest -u apiUser:OwnerApiPass123 --request PUT 'http://localhost:8042/api/v1/device/svi?module=fdo_sys&"
+              + "var=active&priority=0&bytes=F5' --header 'Content-Type: application/octet-stream'"};
+      TestProcess shellServiceInfo = new TestProcess(testPath, shellCmdServiceInfoActivate);
+      try (TestProcess.Handle hShellCmd = shellServiceInfo.start()) {
+        hShellCmd.waitFor(2000, TimeUnit.MILLISECONDS);
+      }
+
+      String[] shellCmdServiceInfoFileTransfer = {"bash", "-cx",
+          "curl --location --digest -u apiUser:OwnerApiPass123 --request PUT 'http://localhost:8042/api/v1/device/svi?module=fdo_sys&"
+              + "var=filedesc&priority=1&filename=linux64.sh&guid=" + guid
+              + "' --header 'Content-Type: application/octet-stream' --data-binary "
+              + "'@common/src/main/resources/linux64.sh'"};
+
+      TestProcess shellServiceInfoFileTransfer = new TestProcess(testPath,
+          shellCmdServiceInfoFileTransfer);
+      try (TestProcess.Handle hShellCmd = shellServiceInfoFileTransfer.start()) {
+        hShellCmd.waitFor(2000, TimeUnit.MILLISECONDS);
+      }
+
+      String[] shellCmdServiceInfoExec = {"bash", "-cx",
+          "curl --location --digest -u apiUser:OwnerApiPass123 --request PUT 'http://localhost:8042/api/v1/device/svi?module=fdo_sys&"
+              + "var=exec&guid=" + guid + "&priority=2&"
+              + "bytes=82672F62696E2F73686A6C696E757836342E7368' "
+              + "--header 'Content-Type: application/octet-stream'"};
+      TestProcess shellServiceInfoExec = new TestProcess(testPath, shellCmdServiceInfoExec);
+      try (TestProcess.Handle hShellCmd = shellServiceInfoExec.start()) {
+        hShellCmd.waitFor(2000, TimeUnit.MILLISECONDS);
+      }
+
     }
 
     Thread.sleep(fdoToWait.toMillis());
