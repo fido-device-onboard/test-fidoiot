@@ -75,7 +75,7 @@ public abstract class TestCase {
   protected Duration fdoDockerUpTimeout = Duration.of(480, ChronoUnit.SECONDS);
 
   // How long to wait for PRI-FIDO T00
-  protected Duration fdoToWait = Duration.of(315, ChronoUnit.SECONDS);
+  protected Duration fdoToWait = Duration.of(45, ChronoUnit.SECONDS);
 
   /**
    * Get the IP address of the server.
