@@ -62,6 +62,9 @@ public abstract class TestCase {
   protected String mfgOutputDir = null; // Directory where manufacturer will save ownership proxy
   protected String ownerOutputDir = null; // Directory where owner will save ownership proxy
 
+  protected String mfgApiPass = null;
+  protected String ownerApiPass = null;
+
   // A very short wait to complete TO0 after it is scheduled
   protected Duration shortTimeout = Duration.of(5, ChronoUnit.SECONDS);
 
@@ -72,7 +75,7 @@ public abstract class TestCase {
   protected Duration dockerDownTimeout = Duration.of(20, ChronoUnit.SECONDS);
 
   // How long to wait for FIDO Docker services to start up
-  protected Duration fdoDockerUpTimeout = Duration.of(480, ChronoUnit.SECONDS);
+  protected Duration fdoDockerUpTimeout = Duration.of(300, ChronoUnit.SECONDS);
 
   // How long to wait for PRI-FIDO T00
   protected Duration fdoToWait = Duration.of(45, ChronoUnit.SECONDS);
