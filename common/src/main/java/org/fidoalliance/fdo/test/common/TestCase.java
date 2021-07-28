@@ -62,6 +62,9 @@ public abstract class TestCase {
   protected String mfgOutputDir = null; // Directory where manufacturer will save ownership proxy
   protected String ownerOutputDir = null; // Directory where owner will save ownership proxy
 
+  protected String mfgApiPass = null;
+  protected String ownerApiPass = null;
+
   // A very short wait to complete TO0 after it is scheduled
   protected Duration shortTimeout = Duration.of(5, ChronoUnit.SECONDS);
 

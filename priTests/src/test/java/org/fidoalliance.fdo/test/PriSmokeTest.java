@@ -12,6 +12,7 @@ import java.nio.file.Paths;
 import java.util.concurrent.TimeUnit;
 
 import org.fidoalliance.fdo.test.common.CsvUtils;
+import org.fidoalliance.fdo.test.common.PropertiesUtils;
 import org.fidoalliance.fdo.test.common.TestCase;
 import org.fidoalliance.fdo.test.common.TestLogger;
 import org.fidoalliance.fdo.test.common.TestProcess;
@@ -44,6 +45,20 @@ public class PriSmokeTest extends TestCase {
   @BeforeGroups("fdo_pri_smoketest")
   public void startFdoDockerService() throws IOException, InterruptedException {
     TestLogger.info("=====> Starting FDO Docker Service");
+
+    try {
+      mfgApiPass = PropertiesUtils.getProperty(
+          testDir + "/binaries/pri-fidoiot/manufacturer/creds.env",
+          "manufacturer_api_password");
+
+      ownerApiPass = PropertiesUtils.getProperty(
+          testDir + "/binaries/pri-fidoiot/owner/creds.env",
+          "owner_api_password");
+    } catch (IOException ex) {
+      Assert.fail("Couldn't read API Password.");
+      throw ex;
+    }
+
     Path mfgDockerPath = Paths.get(testDir + "/binaries/pri-fidoiot/manufacturer");
     Path ownerDockerPath = Paths.get(testDir + "/binaries/pri-fidoiot/owner");
     Path rvDockerPath = Paths.get(testDir + "/binaries/pri-fidoiot/rv");
@@ -110,15 +125,17 @@ public class PriSmokeTest extends TestCase {
     Thread.sleep(shortTimeout.toMillis());
 
     String[] shellCmdVoucher = {"bash", "-cx",
-        "curl -D - --digest -u apiUser:MfgApiPass123 -XGET http://localhost:8039/api/v1/vouchers/0"
-            + " -o ext_voucher"};
+        "curl -D - --digest -u apiUser:" + mfgApiPass + " "
+            + "-XGET http://localhost:8039/api/v1/vouchers/0 "
+            + "-o ext_voucher"};
     TestProcess shellVoucher = new TestProcess(testPath, shellCmdVoucher);
     try (TestProcess.Handle hShellCmd = shellVoucher.start()) {
       hShellCmd.waitFor(1000, TimeUnit.MILLISECONDS);
     }
 
     String[] shellCmdTo = {"bash", "-cx",
-        "curl -D - --digest -u apiUser:OwnerApiPass123 --header \"Content-Type: application/cbor\" "
+        "curl -D - --digest -u apiUser:" + ownerApiPass + " "
+            + "--header \"Content-Type: application/cbor\" "
             + "--data-binary @ext_voucher http://localhost:8042/api/v1/owner/vouchers/ -o guid"};
     TestProcess shellTo = new TestProcess(testPath, shellCmdTo);
     try (TestProcess.Handle hShellCmdTo = shellTo.start()) {
@@ -130,15 +147,17 @@ public class PriSmokeTest extends TestCase {
       String guid = br.readLine();
 
       String[] shellCmdServiceInfoActivate = {"bash", "-cx",
-          "curl --location --digest -u apiUser:OwnerApiPass123 --request PUT 'http://localhost:8042/api/v1/device/svi?module=fdo_sys&"
-              + "var=active&priority=0&bytes=F5' --header 'Content-Type: application/octet-stream'"};
+          "curl --location --digest -u apiUser:" + ownerApiPass + " "
+          + "--request PUT 'http://localhost:8042/api/v1/device/svi?module=fdo_sys&"
+          + "var=active&priority=0&bytes=F5' --header 'Content-Type: application/octet-stream'"};
       TestProcess shellServiceInfo = new TestProcess(testPath, shellCmdServiceInfoActivate);
       try (TestProcess.Handle hShellCmd = shellServiceInfo.start()) {
         hShellCmd.waitFor(2000, TimeUnit.MILLISECONDS);
       }
 
       String[] shellCmdServiceInfoFileTransfer = {"bash", "-cx",
-          "curl --location --digest -u apiUser:OwnerApiPass123 --request PUT 'http://localhost:8042/api/v1/device/svi?module=fdo_sys&"
+          "curl --location --digest -u apiUser:" + ownerApiPass + " "
+              + "--request PUT 'http://localhost:8042/api/v1/device/svi?module=fdo_sys&"
               + "var=filedesc&priority=1&filename=linux64.sh&guid=" + guid
               + "' --header 'Content-Type: application/octet-stream' --data-binary "
               + "'@common/src/main/resources/linux64.sh'"};
@@ -150,7 +169,8 @@ public class PriSmokeTest extends TestCase {
       }
 
       String[] shellCmdServiceInfoExec = {"bash", "-cx",
-          "curl --location --digest -u apiUser:OwnerApiPass123 --request PUT 'http://localhost:8042/api/v1/device/svi?module=fdo_sys&"
+          "curl --location --digest -u apiUser:" + ownerApiPass + " "
+              + "--request PUT 'http://localhost:8042/api/v1/device/svi?module=fdo_sys&"
               + "var=exec&guid=" + guid + "&priority=2&"
               + "bytes=82672F62696E2F73686A6C696E757836342E7368' "
               + "--header 'Content-Type: application/octet-stream'"};
