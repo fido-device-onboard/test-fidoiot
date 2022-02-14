@@ -253,10 +253,6 @@ public class PriSmokeTest extends TestCase {
 
 
     if (sviEnabled.toLowerCase().equals("true")) {
-      BufferedReader br = new BufferedReader(new FileReader(Paths.get(testDir + "/guid").toFile()));
-      String guid = br.readLine();
-
-
 
       String[] shellCmdServiceInfoFileTransfer1 = {"bash", "-cx", "curl -D - --digest -u apiUser: " +
               "--location --request POST 'http://localhost:8080/api/v1/owner/resource?filename=payload.bin' " +
