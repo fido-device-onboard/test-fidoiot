@@ -1,2 +1,3 @@
 testName,enabled,deviceType,sviEnabled
-component-sample-test,TRUE,component-sample,true
+component-sample-test,FALSE,component-sample,false
+aio-test,TRUE,component-sample,true
