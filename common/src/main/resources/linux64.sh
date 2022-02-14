@@ -1,7 +1,7 @@
 #!/bin/bash
-wget https://raw.githubusercontent.com/secure-device-onboard/pri-fidoiot/master/SECURITY.md
-filename=SECURITY.md
-cksum_tx=2749598590
+
+filename=payload.bin
+cksum_tx=1612472339
 cksum_rx=$(cksum $filename | cut -d ' ' -f 1)
 if [ $cksum_tx -eq $cksum_rx  ]; then
   echo "Device onboarded successfully."
