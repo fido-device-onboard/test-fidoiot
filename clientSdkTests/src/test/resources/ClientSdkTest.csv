@@ -1,2 +1,3 @@
 testName,enabled,deviceType,sviEnabled
-Client-sdk-test,TRUE,client-sdk,TRUE
+Client-sdk-test,FALSE,client-sdk,false
+aio-test,TRUE,client-sdk,true
