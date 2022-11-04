@@ -64,12 +64,14 @@ public class PriSmokeTest extends TestCase {
     Path ownerDockerPath = Paths.get(testDir + "/binaries/pri-fidoiot/owner");
     Path rvDockerPath = Paths.get(testDir + "/binaries/pri-fidoiot/rv");
     Path aioDockerPath = Paths.get(testDir + "/binaries/pri-fidoiot/aio");
+    Path dbDockerPath = Paths.get(testDir + "/binaries/pri-fidoiot/db");
 
     try {
       TestProcess.execute_dockerCmd(mfgDockerPath.toString(), runDockerService + " --build ");
       TestProcess.execute_dockerCmd(rvDockerPath.toString(), runDockerService + " --build ");
       TestProcess.execute_dockerCmd(ownerDockerPath.toString(), runDockerService + " --build ");
       TestProcess.execute_dockerCmd(aioDockerPath.toString(), runDockerService + " --build ");
+      TestProcess.execute_dockerCmd(dbDockerPath.toString(), runDockerService + " --build ");
       Thread.sleep(fdoDockerUpTimeout.toMillis());
     } catch (Exception e) {
       e.printStackTrace();
@@ -86,11 +88,13 @@ public class PriSmokeTest extends TestCase {
     Path ownerDockerPath = Paths.get(testDir + "/binaries/pri-fidoiot/owner");
     Path rvDockerPath = Paths.get(testDir + "/binaries/pri-fidoiot/rv");
     Path aioDockerPath = Paths.get(testDir + "/binaries/pri-fidoiot/aio");
+    Path dbDockerPath = Paths.get(testDir + "/binaries/pri-fidoiot/db");
     try {
       TestProcess.execute_dockerCmd(mfgDockerPath.toString(), downDockerService);
       TestProcess.execute_dockerCmd(ownerDockerPath.toString(), downDockerService);
       TestProcess.execute_dockerCmd(rvDockerPath.toString(), downDockerService);
       TestProcess.execute_dockerCmd(aioDockerPath.toString(), downDockerService);
+      TestProcess.execute_dockerCmd(dbDockerPath.toString(), downDockerService);
       Thread.sleep(dockerDownTimeout.toMillis());
     } catch (Exception e) {
       e.printStackTrace();
@@ -226,11 +230,36 @@ public class PriSmokeTest extends TestCase {
     Assert.assertNotNull(testDir,
             "The environment variable TEST_DIR must be set for tests to execute properly.");
     Path testPath = Paths.get(testDir);
-    Path testDevicePath = Paths.get(testDir + "binaries/pri-fidoiot/device/");
+    Path testDevicePath = Paths.get(testDir + "/binaries/pri-fidoiot/device/");
+    boolean updateRVinfo = true;
 
-    String[] deviceDiCmd = {"bash", "-cx", "java  -Djava.library.path=/home/sdo/linking/test-fidoiot/ -jar device.jar"};
+    if (updateRVinfo) {
+      String[] shellCmdRvInfo = {"bash", "-cx", "curl --location --request " +
+            " POST 'http://localhost:8080/api/v1/rvinfo' --header 'Content-Type: text/plain' " +
+            " --data-raw '[[[5, \"127.0.0.1\"], [3, 8080], [12, 1], [2, \"127.0.0.1\"], [4, 8443]]]' "};
 
-    TestProcess deviceDi = new TestProcess(testPath, deviceDiCmd);
+      TestProcess shellRvInfProcess = new TestProcess(testPath,
+                shellCmdRvInfo);
+      try (TestProcess.Handle hShellCmd = shellRvInfProcess.start()) {
+        hShellCmd.waitFor(2000, TimeUnit.MILLISECONDS);
+      }
+
+      String[] shellCmdOwnerRedirect = {"bash", "-cx", "curl -D - --digest -u apiUser: " +
+      "--location --request POST 'http://localhost:8080/api/v1/owner/redirect' " +
+      "--header 'Content-Type: text/plain' " +
+      "--data-raw '[[\"127.0.0.1\",\"127.0.0.1\",8080,3]]' "};
+
+      TestProcess shellOwnerRedirect = new TestProcess(testPath,
+            shellCmdOwnerRedirect);
+      try (TestProcess.Handle hShellCmd = shellOwnerRedirect.start()) {
+      hShellCmd.waitFor(2000, TimeUnit.MILLISECONDS);
+      }
+
+    }
+
+    String[] deviceDiCmd = {"bash", "-cx", "java -jar device.jar"};
+
+    TestProcess deviceDi = new TestProcess(testDevicePath, deviceDiCmd);
     int deviceResultDi = -1;
     try (TestProcess.Handle hDeviceDi = deviceDi.start()) {
       if (hDeviceDi.waitFor(longTimeout.toMillis(), TimeUnit.MILLISECONDS)) {
@@ -274,7 +303,7 @@ public class PriSmokeTest extends TestCase {
         hShellCmd.waitFor(2000, TimeUnit.MILLISECONDS);
       }
 
-      String[] shellCmdServiceInfoExec = {"bash", "-cx","curl -D - --digest -u apiUser: --location --request POST 'http://localhost:8080/api/v1/owner/svi' --header 'Content-Type: text/plain' --data-raw '[{\"filedesc\" : \"payload.bin\",\"resource\" : \"payload.bin\"},{\"filedesc\" : \"linux64.sh\",\"resource\" : \"linux64.sh\"},{\"exec\" : [\"/bin/bash\",\"linux64.sh\"]}]'"};
+      String[] shellCmdServiceInfoExec = {"bash", "-cx","curl --location --request POST 'http://localhost:8080/api/v1/owner/svi' --header 'Content-Type: text/plain' --data-raw '[{\"filedesc\" : \"payload.bin\",\"resource\" : \"payload.bin\"},{\"filedesc\" : \"linux64.sh\",\"resource\" : \"linux64.sh\"},{\"exec\" : [\"/bin/bash\",\"linux64.sh\"]}]'"};
     
       TestProcess shellServiceInfoExec = new TestProcess(testPath, shellCmdServiceInfoExec);
       try (TestProcess.Handle hShellCmd = shellServiceInfoExec.start()) {
@@ -283,9 +312,9 @@ public class PriSmokeTest extends TestCase {
 
     }
 
-    String[] deviceToCmd = {"bash", "-cx", "java  -Djava.library.path=/home/sdo/linking/test-fidoiot/ -jar device.jar"};
+    String[] deviceToCmd = {"bash", "-cx", "java -jar device.jar"};
 
-    TestProcess deviceTo = new TestProcess(testPath, deviceToCmd);
+    TestProcess deviceTo = new TestProcess(testDevicePath, deviceToCmd);
     int deviceResultTo = -1;
     try (TestProcess.Handle hDeviceTo = deviceTo.start()) {
       if (hDeviceTo.waitFor(longTimeout.toMillis(), TimeUnit.MILLISECONDS)) {
@@ -305,7 +334,7 @@ public class PriSmokeTest extends TestCase {
             "ERROR: Device TO did not exit properly. Exit value: " + deviceResultTo + "; ");
 
     if (sviEnabled.toLowerCase().equals("true")) {
-      String logFileDevice = Paths.get(testDir, resultFile).toString();
+      String logFileDevice = Paths.get(testDevicePath.toString(), "app-data", resultFile).toString();
       Assert.assertTrue(
               TestUtil.fileContainsString(logFileDevice, "Device onboarded successfully.", true),
               "ERROR: Device: ServiceInfo not processed successfully.");
