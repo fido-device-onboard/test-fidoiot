@@ -64,11 +64,14 @@ public class ClientSdkTest extends TestCase {
     Path ownerDockerPath = Paths.get(testDir + "/binaries/pri-fidoiot/owner");
     Path rvDockerPath = Paths.get(testDir + "/binaries/pri-fidoiot/rv");
     Path aioDockerPath = Paths.get(testDir + "/binaries/pri-fidoiot/aio");
+    Path dbDockerPath = Paths.get(testDir + "/binaries/pri-fidoiot/db");
+
     try {
-      TestProcess.execute_dockerCmd(mfgDockerPath.toString(), runDockerService + " --build ");
-      TestProcess.execute_dockerCmd(rvDockerPath.toString(), runDockerService + " --build ");
-      TestProcess.execute_dockerCmd(ownerDockerPath.toString(), runDockerService + " --build ");
+      //TestProcess.execute_dockerCmd(mfgDockerPath.toString(), runDockerService + " --build ");
+      //TestProcess.execute_dockerCmd(rvDockerPath.toString(), runDockerService + " --build ");
+      //TestProcess.execute_dockerCmd(ownerDockerPath.toString(), runDockerService + " --build ");
       TestProcess.execute_dockerCmd(aioDockerPath.toString(), runDockerService + " --build ");
+      TestProcess.execute_dockerCmd(dbDockerPath.toString(), runDockerService + " --build ");
       Thread.sleep(fdoDockerUpTimeout.toMillis());
     } catch (Exception e) {
       e.printStackTrace();
@@ -85,11 +88,13 @@ public class ClientSdkTest extends TestCase {
     Path ownerDockerPath = Paths.get(testDir + "/binaries/pri-fidoiot/owner");
     Path rvDockerPath = Paths.get(testDir + "/binaries/pri-fidoiot/rv");
     Path aioDockerPath = Paths.get(testDir + "/binaries/pri-fidoiot/aio");
+    Path dbDockerPath = Paths.get(testDir + "/binaries/pri-fidoiot/db");
     try {
-      TestProcess.execute_dockerCmd(mfgDockerPath.toString(), downDockerService);
-      TestProcess.execute_dockerCmd(ownerDockerPath.toString(), downDockerService);
-      TestProcess.execute_dockerCmd(rvDockerPath.toString(), downDockerService);
+      //TestProcess.execute_dockerCmd(mfgDockerPath.toString(), downDockerService);
+      //TestProcess.execute_dockerCmd(ownerDockerPath.toString(), downDockerService);
+      //TestProcess.execute_dockerCmd(rvDockerPath.toString(), downDockerService);
       TestProcess.execute_dockerCmd(aioDockerPath.toString(), downDockerService);
+      TestProcess.execute_dockerCmd(dbDockerPath.toString(), downDockerService);
       Thread.sleep(dockerDownTimeout.toMillis());
     } catch (Exception e) {
       e.printStackTrace();
@@ -221,6 +226,31 @@ public class ClientSdkTest extends TestCase {
             "The environment variable TEST_DIR must be set for tests to execute properly.");
     Path testPath = Paths.get(testDir);
     Path testDevicePath = Paths.get(testDir + "binaries/client-sdk-fidoiot");
+    boolean updateRVinfo = true;
+    if (updateRVinfo) {
+      String[] shellCmdRvInfo = {"bash", "-cx", "curl --location --request " +
+            " POST 'http://localhost:8080/api/v1/rvinfo' --header 'Content-Type: text/plain' " +
+            " --data-raw '[[[5, \"127.0.0.1\"], [3, 8080], [12, 1], [2, \"127.0.0.1\"], [4, 8443]]]' "};
+
+
+      TestProcess shellRvInfProcess = new TestProcess(testPath,
+                shellCmdRvInfo);
+      try (TestProcess.Handle hShellCmd = shellRvInfProcess.start()) {
+        hShellCmd.waitFor(2000, TimeUnit.MILLISECONDS);
+      }
+
+      String[] shellCmdOwnerRedirect = {"bash", "-cx", "curl -D - --digest -u apiUser: " +
+      "--location --request POST 'http://localhost:8080/api/v1/owner/redirect' " +
+      "--header 'Content-Type: text/plain' " +
+      "--data-raw '[[\"127.0.0.1\",\"127.0.0.1\",8080,3]]' "};
+
+      TestProcess shellOwnerRedirect = new TestProcess(testPath,
+            shellCmdOwnerRedirect);
+      try (TestProcess.Handle hShellCmd = shellOwnerRedirect.start()) {
+      hShellCmd.waitFor(2000, TimeUnit.MILLISECONDS);
+      }
+
+    }
 
     String[] deviceDiCmd = {"bash", "-cx", "./binaries/client-sdk-fidoiot/linux-client"};
 
@@ -268,7 +298,7 @@ public class ClientSdkTest extends TestCase {
         hShellCmd.waitFor(2000, TimeUnit.MILLISECONDS);
       }
 
-      String[] shellCmdServiceInfoExec = {"bash", "-cx","curl -D - --digest -u apiUser: --location --request POST 'http://localhost:8080/api/v1/owner/svi' --header 'Content-Type: text/plain' --data-raw '[{\"filedesc\" : \"payload.bin\",\"resource\" : \"payload.bin\"},{\"filedesc\" : \"linux64.sh\",\"resource\" : \"linux64.sh\"},{\"exec\" : [\"/bin/bash\",\"linux64.sh\"]}]'"};
+      String[] shellCmdServiceInfoExec = {"bash", "-cx","curl --location --request POST 'http://localhost:8080/api/v1/owner/svi' --header 'Content-Type: text/plain' --data-raw '[{\"filedesc\" : \"payload.bin\",\"resource\" : \"payload.bin\"},{\"filedesc\" : \"linux64.sh\",\"resource\" : \"linux64.sh\"},{\"exec\" : [\"/bin/bash\",\"linux64.sh\"]}]'"};
 
       TestProcess shellServiceInfoExec = new TestProcess(testPath, shellCmdServiceInfoExec);
       try (TestProcess.Handle hShellCmd = shellServiceInfoExec.start()) {

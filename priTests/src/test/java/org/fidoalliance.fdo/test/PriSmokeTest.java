@@ -67,9 +67,9 @@ public class PriSmokeTest extends TestCase {
     Path dbDockerPath = Paths.get(testDir + "/binaries/pri-fidoiot/db");
 
     try {
-      TestProcess.execute_dockerCmd(mfgDockerPath.toString(), runDockerService + " --build ");
-      TestProcess.execute_dockerCmd(rvDockerPath.toString(), runDockerService + " --build ");
-      TestProcess.execute_dockerCmd(ownerDockerPath.toString(), runDockerService + " --build ");
+//      TestProcess.execute_dockerCmd(mfgDockerPath.toString(), runDockerService + " --build ");
+//      TestProcess.execute_dockerCmd(rvDockerPath.toString(), runDockerService + " --build ");
+//      TestProcess.execute_dockerCmd(ownerDockerPath.toString(), runDockerService + " --build ");
       TestProcess.execute_dockerCmd(aioDockerPath.toString(), runDockerService + " --build ");
       TestProcess.execute_dockerCmd(dbDockerPath.toString(), runDockerService + " --build ");
       Thread.sleep(fdoDockerUpTimeout.toMillis());
@@ -90,9 +90,9 @@ public class PriSmokeTest extends TestCase {
     Path aioDockerPath = Paths.get(testDir + "/binaries/pri-fidoiot/aio");
     Path dbDockerPath = Paths.get(testDir + "/binaries/pri-fidoiot/db");
     try {
-      TestProcess.execute_dockerCmd(mfgDockerPath.toString(), downDockerService);
-      TestProcess.execute_dockerCmd(ownerDockerPath.toString(), downDockerService);
-      TestProcess.execute_dockerCmd(rvDockerPath.toString(), downDockerService);
+//      TestProcess.execute_dockerCmd(mfgDockerPath.toString(), downDockerService);
+//      TestProcess.execute_dockerCmd(ownerDockerPath.toString(), downDockerService);
+//      TestProcess.execute_dockerCmd(rvDockerPath.toString(), downDockerService);
       TestProcess.execute_dockerCmd(aioDockerPath.toString(), downDockerService);
       TestProcess.execute_dockerCmd(dbDockerPath.toString(), downDockerService);
       Thread.sleep(dockerDownTimeout.toMillis());
