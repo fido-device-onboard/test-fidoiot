@@ -26,7 +26,7 @@
     <!-- libraries -->
     <net-java-dev-jna.version>5.8.0</net-java-dev-jna.version>
     <log4j2.version>2.17.1</log4j2.version>
-    <testng.version>7.7.0</testng.version>
+    <testng.version>7.7.1</testng.version>
 
     <!-- maven plugins -->
     <checkstyle.version>8.11</checkstyle.version>
