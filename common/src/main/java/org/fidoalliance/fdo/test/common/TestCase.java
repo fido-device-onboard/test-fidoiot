@@ -180,7 +180,7 @@ public abstract class TestCase {
       TestLogger.info("ownerOutputDir:  " + ownerOutputDir);
     } else {
       TestLogger.error("Environment variable TEST_DIR was not set properly.  "
-          + "See 'Set up your SDET Environment' on the SDO wiki for more information.");
+          + "See 'Set up your SDET Environment' on the FDO wiki for more information.");
     }
   }
 
