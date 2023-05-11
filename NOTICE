@@ -492,7 +492,7 @@ the following components use GNU Lesser General Public License v2.1 or later
 
 Java Native Access
 
-The source code for this component is available here - https://github.com/secure-device-onboard/release-fidoiot/releases/download/v1.1.0/third-party-components.tar.gz
+The source code for this component is available here - https://github.com/fido-device-onboard/release-fidoiot/releases/download/v1.1.0/third-party-components.tar.gz
 
 SPDX-License-Identifier: Apache-2.0 OR LGPL-2.1
 
