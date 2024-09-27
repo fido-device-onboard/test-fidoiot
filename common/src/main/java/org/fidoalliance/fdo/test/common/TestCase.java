@@ -33,8 +33,8 @@ public abstract class TestCase {
 
   protected static final String resultFile = "result.txt";
   //Iot Platform SDK Docker commands
-  protected static final String runDockerService = "docker-compose up";
-  protected static final String downDockerService = "docker-compose down";
+  protected static final String runDockerService = "docker compose up";
+  protected static final String downDockerService = "docker compose down";
   // Spring arguments
   protected static final String D_JAVA_LIBRARY_PATH = "-Djava.library.path=";
   // Environment constants
