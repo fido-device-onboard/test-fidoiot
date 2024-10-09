@@ -1,0 +1,24 @@
+name: testfidoiot
+on:
+  workflow_dispatch:
+  push:
+    branches: [master, '*rel']
+  pull_request:
+    branches: [master, '*rel']
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: scm checkout
+        uses: actions/checkout@v3
+      - name: setup-java
+        uses: actions/setup-java@v3
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+      - name: build
+        run: |
+          mvn compile
