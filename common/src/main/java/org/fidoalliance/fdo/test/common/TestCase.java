@@ -33,8 +33,8 @@ public abstract class TestCase {
 
   protected static final String resultFile = "result.txt";
   //Iot Platform SDK Docker commands
-  protected static final String runDockerService = "docker-compose up";
-  protected static final String downDockerService = "docker-compose down";
+  protected static final String runDockerService = "docker compose up --build";
+  protected static final String downDockerService = "docker compose down";
   // Spring arguments
   protected static final String D_JAVA_LIBRARY_PATH = "-Djava.library.path=";
   // Environment constants
@@ -75,7 +75,7 @@ public abstract class TestCase {
   protected Duration dockerDownTimeout = Duration.of(20, ChronoUnit.SECONDS);
 
   // How long to wait for FIDO Docker services to start up
-  protected Duration fdoDockerUpTimeout = Duration.of(360, ChronoUnit.SECONDS);
+  protected Duration fdoDockerUpTimeout = Duration.of(120, ChronoUnit.SECONDS);
 
   // How long to wait for PRI-FIDO T00
   protected Duration fdoToWait = Duration.of(45, ChronoUnit.SECONDS);

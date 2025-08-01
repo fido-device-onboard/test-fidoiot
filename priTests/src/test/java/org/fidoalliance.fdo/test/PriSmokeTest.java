@@ -67,11 +67,11 @@ public class PriSmokeTest extends TestCase {
     Path dbDockerPath = Paths.get(testDir + "/binaries/pri-fidoiot/db");
 
     try {
-//      TestProcess.execute_dockerCmd(mfgDockerPath.toString(), runDockerService + " --build ");
-//      TestProcess.execute_dockerCmd(rvDockerPath.toString(), runDockerService + " --build ");
-//      TestProcess.execute_dockerCmd(ownerDockerPath.toString(), runDockerService + " --build ");
-      TestProcess.execute_dockerCmd(aioDockerPath.toString(), runDockerService + " --build ");
-      TestProcess.execute_dockerCmd(dbDockerPath.toString(), runDockerService + " --build ");
+//      TestProcess.execute_dockerCmd(mfgDockerPath.toString(), runDockerService);
+//      TestProcess.execute_dockerCmd(rvDockerPath.toString(), runDockerService);
+//      TestProcess.execute_dockerCmd(ownerDockerPath.toString(), runDockerService);
+      TestProcess.execute_dockerCmd(aioDockerPath.toString(), runDockerService);
+      TestProcess.execute_dockerCmd(dbDockerPath.toString(), runDockerService);
       Thread.sleep(fdoDockerUpTimeout.toMillis());
     } catch (Exception e) {
       e.printStackTrace();
